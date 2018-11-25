@@ -4,4 +4,4 @@ import cv2
 
 image = cv2.imread("./data/Aaron_Peirsol_0001.jpg")
 cv2.imshow("image", image)
-cv2.waitKey(0)
+# cv2.waitKey(0)
