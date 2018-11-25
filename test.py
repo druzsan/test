@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from models.vgg16 import VGG16 as net
 from models.imagenet_utils import preprocess_input, decode_predictions
 
@@ -11,6 +12,6 @@ image = cv2.resize(image, (224, 224))
 # cv2.waitKey(0)
 
 input = preprocess_input(image)
-output = model.predict(input)
+output = model.predict(np.expand_dims(input, axis=0))
 prediction = decode_predictions(output)
 print(prediction)
