@@ -1,6 +1,6 @@
 import cv2
-from .models.vgg16 import VGG16 as net
-from .models.imagenet_utils import preprocess_input, decode_predictions
+from models.vgg16 import VGG16 as net
+from models.imagenet_utils import preprocess_input, decode_predictions
 
 model = net()
 
