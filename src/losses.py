@@ -9,6 +9,11 @@ def arc_loss(s=64., m=.5):
     :param m: inter-class angle margin on the hypersphere [float]
     :return: ArcFace Loss function
     """
+    cos_m = math.cos(m)
+    sin_m = math.sin(m)
+    mm = sin_m * m
+    threshold = math.cos(math.pi - m)
+
     def loss_function(y_true, y_pred):
         """
         ArcFace Loss function.
@@ -21,11 +26,6 @@ def arc_loss(s=64., m=.5):
         :param y_pred: logits [tensor of shape (batch_size, classes)]
         :return: ArcFace Loss
         """
-        cos_m = math.cos(m)
-        sin_m = math.sin(m)
-        mm = sin_m * m
-        threshold = math.cos(math.pi - m)
-
         cos_t = y_pred
         cos_t2 = backend.square(cos_t)
         sin_t2 = 1. - cos_t2
@@ -43,9 +43,38 @@ def arc_loss(s=64., m=.5):
 
         s_cos_t = s * cos_t
 
-        prediction_with_margin = s_cos_t * inv_mask + cos_mt_temp * y_true
+        prediction_with_margin = s_cos_t * inv_mask + cos_mt_temp * mask
 
         loss = backend.categorical_crossentropy(y_true, prediction_with_margin, from_logits=True)
+        return loss
+
+    return loss_function
+
+
+def cos_loss(s=64., m=.4):
+
+    def loss_function(y_true, y_pred):
+        # Implementation according to https://github.com/auroua/InsightFace_TF
+        cos_t = y_pred
+        cos_t_m = cos_t - m
+
+        mask = y_true
+        inv_mask = 1. - mask
+
+        prediction_with_margin = s * cos_t * inv_mask + s * cos_t_m * mask
+
+        loss = backend.categorical_crossentropy(y_true, prediction_with_margin, from_logits=True)
+        return loss
+
+    return loss_function
+
+
+def cos_loss_v2(s=64., m=.4):
+    sm = s * m
+
+    def loss_function(y_true, y_pred):
+        # My own implementation
+        loss = backend.categorical_crossentropy(y_true, s * y_pred - sm * y_true, from_logits=True)
         return loss
 
     return loss_function
